@@ -14,12 +14,12 @@
 #include "BodyForceApplier.h"
 #include "ConvectionBoundaryConditionApplier.h"
 #include "IncrementInterpolationHandler.h"
-#include "mpi.h"
 #include "utilities.h"
 #include "DoFSystem.h"
 #include "BoundaryUnidirectionalPenaltySpec.h"
 
 using namespace dealii;
+using namespace Functions;
 
 namespace PlasticityLab {
 

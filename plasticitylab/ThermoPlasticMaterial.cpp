@@ -11,6 +11,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
 
+#include "symmetric_tensor_entries.h"
+
 #include "ExponentialHardeningThermoviscoplasticYieldLaw.h"
 #include "JohnsonCookThermoviscoplasticYieldLaw.h"
 
@@ -69,7 +71,8 @@ namespace PlasticityLab {
   std::vector<Number> ThermoPlasticMaterial<dim, ViscoplasticYieldLaw, Number>::get_state_parameters(
         const point_index_t &point_index,
         const Tensor<2, dim, Number> &reference_transformation) const {
-      std::vector<Number> state_parameters;
+    std::vector<Number> state_parameters;
+    state_parameters.reserve(get_material_parameter_count());
 
     const PointHistory<dim, Number> &point_history = material_point_history.at(point_index);
     state_parameters.push_back(std::log(1 + point_history.hardening_parameters.equivalent_plastic_strain));
@@ -84,16 +87,17 @@ namespace PlasticityLab {
             isochoric_reference_transformation
             * static_cast<Tensor<2, dim, Number>>(point_history.plastic_strain)
             * transpose(isochoric_reference_transformation)));
-    for(const Number *element=log_of_b_e.begin_raw();
-          element!=log_of_b_e.end_raw();
-          element++) {
-      state_parameters.push_back(*element);
+
+    for (const auto &element :
+     dealii_utils::symmetric_tensor_entries(log_of_b_e)) {
+      state_parameters.push_back(element);
     }
 
-    for(const Number *element=point_history.hardening_parameters.kinematic_hardening.begin_raw();
-          element!=point_history.hardening_parameters.kinematic_hardening.end_raw();
-          element++) {
-      state_parameters.push_back(*element);
+    for (const auto &element :
+     dealii_utils::symmetric_tensor_entries(
+      point_history.hardening_parameters.kinematic_hardening)
+    ) {
+      state_parameters.push_back(element);
     }
 
     state_parameters.push_back(std::log(std::pow(reference_transformation_Jacobian, 1) * point_history.material_Jacobian));
@@ -117,10 +121,10 @@ namespace PlasticityLab {
     point_history.hardening_parameters.equivalent_plastic_strain = std::exp(state_parameters[cursor++]) - 1;
 
     SymmetricTensor<2, dim, Number> log_of_b_e;
-    for(Number *element=log_of_b_e.begin_raw();
-          element!=log_of_b_e.end_raw();
-          element++) {
-      *element = state_parameters[cursor++];
+
+    for (auto &element :
+     dealii_utils::symmetric_tensor_entries(log_of_b_e)) {
+      element = state_parameters[cursor++];
     }
 
     const Number reference_transformation_Jacobian = determinant(reference_transformation);
@@ -132,10 +136,11 @@ namespace PlasticityLab {
         * static_cast<Tensor<2, dim, Number>>(get_exp_of_tensor(log_of_b_e))
         * transpose(inverse_isochoric_reference_transformation));
 
-    for(Number *element=point_history.hardening_parameters.kinematic_hardening.begin_raw();
-          element!=point_history.hardening_parameters.kinematic_hardening.end_raw();
-          element++) {
-      *element = state_parameters[cursor++];
+    for (auto &element :
+     dealii_utils::symmetric_tensor_entries(
+      point_history.hardening_parameters.kinematic_hardening
+    )) {
+      element = state_parameters[cursor++];
     }
 
     point_history.material_Jacobian = std::pow(reference_transformation_Jacobian, -1) * std::exp(state_parameters[cursor++]);

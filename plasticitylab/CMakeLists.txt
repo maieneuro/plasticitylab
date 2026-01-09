@@ -1,5 +1,5 @@
 ##
-#  CMake script for the step-42 tutorial program:
+#  CMake script for the PlasticityLab project:
 ##
 
 # Set the name of the project and target:
@@ -20,40 +20,41 @@ FILE(GLOB_RECURSE TARGET_INC  "*.h")
 SET(TARGET_SRC ${TARGET_SRC}  ${TARGET_INC})
 
 # Define the output that should be cleaned:
-SET(CLEAN_UP_FILES *.vtu *.pvtu *.visit)
+set(CLEAN_UP_FILES *.vtu *.pvtu *.visit)
 
 # Usually, you will not need to modify anything beyond this point...
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.13.4)
 
-FIND_PACKAGE(deal.II 8.4.0 QUIET
+find_package(deal.II 9.7.0
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
-IF(NOT ${deal.II_FOUND})
-  MESSAGE(FATAL_ERROR "\n"
+if(NOT ${deal.II_FOUND})
+  message(FATAL_ERROR "\n"
     "*** Could not locate a (sufficiently recent) version of deal.II. ***\n\n"
     "You may want to either pass a flag -DDEAL_II_DIR=/path/to/deal.II to cmake\n"
     "or set an environment variable \"DEAL_II_DIR\" that contains this path."
     )
-ENDIF()
+endif()
 
 #
 # Are all dependencies fulfilled?
 #
-IF( NOT DEAL_II_WITH_MPI OR
-    NOT DEAL_II_WITH_P4EST OR
-    NOT DEAL_II_WITH_TRILINOS )
-  MESSAGE(FATAL_ERROR "
-Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+if(NOT DEAL_II_WITH_MPI OR NOT DEAL_II_WITH_P4EST OR NOT DEAL_II_WITH_TRILINOS)
+  message(FATAL_ERROR "
+Error! This project requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
     DEAL_II_WITH_TRILINOS = ON
-One or all of these are OFF in your installation but are required for this tutorial step."
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
+    DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
+    DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
+    DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}
+This conflicts with the requirements."
     )
-ENDIF()
+endif()
 
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
-PROJECT(${TARGET} CXX)
+deal_ii_initialize_cached_variables()
+project(${TARGET} CXX)
 
-DEAL_II_INVOKE_AUTOPILOT()
-
+deal_ii_invoke_autopilot()

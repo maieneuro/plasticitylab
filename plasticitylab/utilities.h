@@ -2,6 +2,7 @@
 #define _UTILITIES_H
 
 #include <deal.II/base/utilities.h>
+#include <mpi.h>
 
 namespace PlasticityLab {
 
