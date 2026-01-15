@@ -24,8 +24,8 @@ namespace PlasticityLab {
     // make_grid_();
     // make_ball_in_hypershell_grid(
     // make_cylindrical_grid(
-    // make_necking_grid(
-    make_cylindrical_impact_grid(
+    // make_cylindrical_impact_grid(
+    make_necking_grid(
       triangulation,
       mech_lbc_system,
       therm_lbc_system,

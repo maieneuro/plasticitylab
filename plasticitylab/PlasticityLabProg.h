@@ -429,7 +429,7 @@ namespace PlasticityLab {
 
     std::unordered_map<size_t, Tensor<1, dim+1, Number>> material_area_factors;
 
-    Number time_increment = 0.5e-6; /*1.0e-01;*/ // [s]
+    Number time_increment = 1.0e-01; /*0.5e-6;*/ // [s]
     unsigned int output_rate = 1;
     Number time_since_start = 0;
 
